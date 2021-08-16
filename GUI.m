@@ -182,8 +182,14 @@ noseHasBeenDetected = false;
 %     title("inside if")
 end
 
-
-
+%% display result as message
+if noseHasBeenDetected && mouthHasBeenDetected
+    f = msgbox('Please wear mask');
+elseif noseHasBeenDetected || mouthHasBeenDetected
+    f = msgbox('Please wear mask properly');
+else
+    f = msgbox('Thank you for wearing mask!!!');
+end
 
 
 % --- Executes on button press in pushbutton3.

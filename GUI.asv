@@ -134,9 +134,12 @@ global noseHasBeenDetected;
  
  mouth = insertObjectAnnotation(faceCropedImg,'rectangle',mouthbox,'Mouth');   
  mouthHasBeenDetected = true;
-figure
-imshow(mouth)
-title('Detected Mouth');
+ axes(handles.axes4);
+ imshow(mouth); 
+ 
+% figure
+% imshow(mouth)
+% title('Detected Mouth');
 
 %% check if there is no mouth detection 
  
@@ -163,8 +166,8 @@ end
     axes(handles.axes3);
    imshow(nose); 
 % figure
-imshow(nose)
-title('Detected Nose');
+% imshow(nose)
+% title('Detected Nose');
 
 %% check if there is no nose detection 
  
@@ -179,7 +182,9 @@ noseHasBeenDetected = false;
 %     title("inside if")
 end
 
-
+%% display result as message
+if noseHasBeenDetected && mouthHasBeenDetected
+    f = msgbox('Operation Completed');
 
 
 
