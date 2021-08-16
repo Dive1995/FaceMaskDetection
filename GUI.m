@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 
 % Edit the above text to modify the response to help GUI
 
-% Last Modified by GUIDE v2.5 16-Aug-2021 11:03:04
+% Last Modified by GUIDE v2.5 16-Aug-2021 13:13:32
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,8 +79,11 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global img
+% get image
 [filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif)'},'Choose an image');
 img=imread(filename);
+
+% show image in the GUI axes
 axes(handles.axes1);
 imshow(img);
 
@@ -91,9 +94,39 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% detect nose & mouth from the faceCropedImg
+
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global img;
+global faceDetectedImg;
+global faceCropedImg;
+
+
+detector = vision.CascadeObjectDetector;
+% detector=vision.CascadeObjectDetector('MergeThreshold',30);
+
+bbox = detector(img);
+
+faceDetectedImg = insertObjectAnnotation(img,'rectangle',bbox,'Face');   
+% figure
+% imshow(IFaces)
+% title('Detected faces');
+
+% faceCropedImg=imcrop(faceDetectedImg,[75 78 110 100]);
+for i = 1 : size(bbox, 1) 
+  faceCropedImg = imcrop(img, bbox(i, :));
+%   subplot(6, 6, i);
+  axes(handles.axes2);
+  imshow(faceCropedImg); 
+end
+
+% axes(handles.axes2);
+% imshow(faceCropedImg);
+
+
+% crop the image
