@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 
 % Edit the above text to modify the response to help GUI
 
-% Last Modified by GUIDE v2.5 16-Aug-2021 13:13:32
+% Last Modified by GUIDE v2.5 16-Aug-2021 14:33:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -80,7 +80,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global img
 % get image
-[filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif)'},'Choose an image');
+[filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
 img=imread(filename);
 
 % show image in the GUI axes
@@ -95,6 +95,25 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % detect nose & mouth from the faceCropedImg
+% global img;
+% global faceDetectedImg;
+global faceCropedImg;
+
+% img = imread('Camping.jpg');
+faceCropedImg = imresize(faceCropedImg,2);
+% imshow(img);
+
+detector=vision.CascadeObjectDetector('Mouth','MergeThreshold',100);
+
+bbox = detector(faceCropedImg);
+whos bbox;
+
+IFaces = insertObjectAnnotation(faceCropedImg,'rectangle',bbox,'Mouth');   
+whos IFaces
+figure
+imshow(IFaces)
+title('Detected Mouth');
+
 
 
 % --- Executes on button press in pushbutton3.
@@ -130,3 +149,14 @@ end
 
 
 % crop the image
+
+
+% --- Executes on button press in pushbutton4.
+function pushbutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+clear global img;
+clear global faceCropedImg;
+clear global faceDetectedImg;
