@@ -94,27 +94,93 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% detect nose & mouth from the faceCropedImg
-% global img;
-% global faceDetectedImg;
+global img;
 global faceCropedImg;
+global emptyArray;
+global mouthHasBeenDetected;
+global noseHasBeenDetected;
 
-if 
+% mouthdetect = vision.CascadeObjectDetector('Mouth');
 
-% img = imread('Camping.jpg');
-  faceCropedImg = imresize(faceCropedImg,2);
-% imshow(img);
+% mouthdetect.MergeThreshold = 1; % Threshold value, starts at 1 or any value you want
 
-detector=vision.CascadeObjectDetector('Mouth','MergeThreshold',100);
+% FaceFound = 0;
+% whos FaceFound;
+% while FaceFound == 0
+%       bb_m = step(mouthdetect, faceCropedImg); % Detects mouth in image.
+%       whos bb_m;
+%       if(bb_m == emptyArray) % Check if a mouth is found, if not increase the Threshold by 1
+%           mouthdetect.MergeThreshold = mouthdetect.MergeThreshold + 1;
+%       else  
+%           mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', bb_m, 'Mouth'); % Annotation
+%           % mouth = imcrop(face, bb_m); % Crop segmented mouth
+%           FaceFound = 1;
+%           figure;
+%           imshow(mouth);
+%       end
+%  end
 
-bbox = detector(faceCropedImg);
-whos bbox;
 
-IFaces = insertObjectAnnotation(faceCropedImg,'rectangle',bbox,'Mouth');   
-whos IFaces
+%% resizing the croped image ## because it is small
+
+ faceCropedImg = imresize(faceCropedImg,1.5);
+ 
+ %%  displaying the mouth detection if detected
+
+ mouthdetector=vision.CascadeObjectDetector('Mouth','MergeThreshold',200);
+ 
+ mouthbox = mouthdetector(faceCropedImg);
+ whos mouthbox;
+ 
+ mouth = insertObjectAnnotation(faceCropedImg,'rectangle',mouthbox,'Mouth');   
+ mouthHasBeenDetected = true;
 figure
-imshow(IFaces)
+imshow(mouth)
+title('Detected Mouth');
+
+%% check if there is no mouth detection 
+ 
+Bdouble = double.empty(0,4);
+box = double(mouthbox);
+
+if size(box) == size(Bdouble)
+%     set global variable mouthHasBeenDetected to true
+
+mouthHasBeenDetected = false;
+%     figure
+%     imshow(img);
+%     title("inside if")
+end
+
+%% checking for nose detection
+  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',50);
+  
+  nosebox = nosedetector(faceCropedImg);
+  whos nosebox;
+ 
+ nose = insertObjectAnnotation(faceCropedImg,'rectangle',nosebox,'Nose');   
+ noseHasBeenDetected = true;
+    axes(handles.axes3);
+   imshow(nose); 
+% figure
+imshow(nose)
 title('Detected Nose');
+
+%% check if there is no nose detection 
+ 
+% Bdouble = double.empty(0,4);
+% box = double(mouthbox);
+
+if size(box) == size(Bdouble)
+%     set global variable mouthHasBeenDetected to true
+noseHasBeenDetected = false;
+%     figure
+%     imshow(img);
+%     title("inside if")
+end
+
+
+
 
 
 % --- Executes on button press in pushbutton3.
@@ -122,6 +188,8 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% declaring global values
 global img;
 global faceDetectedImg;
 global faceCropedImg;
@@ -133,23 +201,23 @@ detector = vision.CascadeObjectDetector;
 bbox = detector(img);
 
 faceDetectedImg = insertObjectAnnotation(img,'rectangle',bbox,'Face');   
-% figure
-% imshow(IFaces)
-% title('Detected faces');
 
-% faceCropedImg=imcrop(faceDetectedImg,[75 78 110 100]);
-for i = 1 : size(bbox, 1) 
-  faceCropedImg = imcrop(img, bbox(i, :));
-%   subplot(6, 6, i);
-  axes(handles.axes2);
-  imshow(faceCropedImg); 
-end
+% crop and segment the face from the image using for loop
 
+ for i = 1 : size(bbox, 1) 
+   faceCropedImg = imcrop(img, bbox(i, :));
+   axes(handles.axes2);
+   imshow(faceCropedImg); 
+ end
+
+%  crop face without using for loop ## does not work for now
+
+% faceCropedImg = imcrop(img, bbox);
 % axes(handles.axes2);
 % imshow(faceCropedImg);
 
 
-% crop the image
+
 
 
 % --- Executes on button press in pushbutton4.
@@ -158,6 +226,8 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% clear all values
 clear global img;
 clear global faceCropedImg;
 clear global faceDetectedImg;
+close all;
