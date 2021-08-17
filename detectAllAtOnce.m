@@ -1,7 +1,7 @@
 clear all;
 close all;
 
-k=imread('mask2.jpeg'); %image to be read. For the viva I used 5 png photos for demonstarte the system.
+k=imread('nomask5.jpeg'); %image to be read. For the viva I used 5 png photos for demonstarte the system.
 I=k(:,:,1);
 
 %% Here "vision.CascadeObjectDetector(") is located in the package called "vision". This one can detect objects using the "Viola-Jones algorithm".

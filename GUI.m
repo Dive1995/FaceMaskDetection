@@ -80,12 +80,22 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global img
 % get image
-[filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
-img=imread(filename);
+% [filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
+% img=imread(filename);
+
+ [filename, pathname] = uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
+    if isequal(filename,0) || isequal(pathname,0)
+       disp('User pressed cancel')
+    else
+       filename=strcat(pathname,filename);
+       img=imread(filename);
+%         img=imrotate(img, 270);
+       axes(handles.axes1);
+        imshow(img);
+    end
 
 % show image in the GUI axes
-axes(handles.axes1);
-imshow(img);
+
 
 
 % --- Executes on button press in pushbutton2.
@@ -113,7 +123,7 @@ while MouthFound == 0
     mouthdetector=vision.CascadeObjectDetector('Mouth');
     
     % set innitial threshold value
-    mouthdetector.MergeThreshold = 200;
+    mouthdetector.MergeThreshold = 60;
     % box for mouth detection
     mouthbox = mouthdetector(faceCropedImg);
     
@@ -129,9 +139,9 @@ while MouthFound == 0
           a=mouthdetector.MergeThreshold
           
           %while threshold value is greater than 5 decrease threshold value by 1 
-          while mouthdetector.MergeThreshold > 5
+          while mouthdetector.MergeThreshold > 40
               %b is declared for testing purpose
-              c=mouthdetector.MergeThreshold
+              m=mouthdetector.MergeThreshold
               
               %reduce by 1
               mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 1;
@@ -149,7 +159,7 @@ while MouthFound == 0
                   axes(handles.axes4);
                   imshow(mouth); 
                   break;
-              elseif mouthdetector.MergeThreshold == 6
+              elseif mouthdetector.MergeThreshold == 40
                   mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth');
                   MouthFound = 0;
                   axes(handles.axes4);
@@ -214,9 +224,9 @@ while NoseFound == 0
     nosedetector=vision.CascadeObjectDetector('Nose');
     
     % set innitial threshold value
-    nosedetector.MergeThreshold = 200;
+    nosedetector.MergeThreshold = 40;
     % box for mouth detection
-    mouthbox = nosedetector(faceCropedImg);
+    nosebox = nosedetector(faceCropedImg);
     
 %     whos mouthbox;
 
@@ -225,14 +235,14 @@ while NoseFound == 0
     % to check if any detection found #here we only need the size only
     notEmptyDouble = ones(1,4);
 
-     if size(mouthbox) == size(emptyDouble) % Check if a mouth is found
+     if size(nosebox) == size(emptyDouble) % Check if a mouth is found
          % a is declared for testing purposes
-          a=nosedetector.MergeThreshold
+          c=nosedetector.MergeThreshold
           
           %while threshold value is greater than 5 decrease threshold value by 1 
-          while nosedetector.MergeThreshold > 5
+          while nosedetector.MergeThreshold > 20
               %b is declared for testing purpose
-              b=nosedetector.MergeThreshold
+              n=nosedetector.MergeThreshold
               
               %reduce by 1
               nosedetector.MergeThreshold = nosedetector.MergeThreshold - 1;
@@ -250,8 +260,8 @@ while NoseFound == 0
 %                   imshow(nose);
 %                   title('finally nose found')
                   break;
-              elseif nosedetector.MergeThreshold == 6
-                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Nose');
+              elseif nosedetector.MergeThreshold == 20
+                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose');
                   NoseFound = 0;
                   axes(handles.axes3);
                   imshow(nose); 
@@ -262,7 +272,7 @@ while NoseFound == 0
           break;
      else  
           nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
-          % mouth = imcrop(face, bb_m); % Crop segmented mouth
+          % mouth = imcrop(face, bb_m); % Crop segmented nose
           NoseFound = 1;
           axes(handles.axes3);
           imshow(nose); 
@@ -320,8 +330,8 @@ global img;
 global faceDetectedImg;
 global faceCropedImg;
 
-facedetector=vision.CascadeObjectDetector('FrontalFaceLBP');
-% facedetector = vision.CascadeObjectDetector;
+% facedetector=vision.CascadeObjectDetector('FrontalFaceLBP');
+facedetector = vision.CascadeObjectDetector;
 % facedetector=vision.CascadeObjectDetector('MergeThreshold',30);
 
 facebox = facedetector(img);
