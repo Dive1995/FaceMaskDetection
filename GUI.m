@@ -100,59 +100,104 @@ global emptyArray;
 global mouthHasBeenDetected;
 global noseHasBeenDetected;
 
-% mouthdetect = vision.CascadeObjectDetector('Mouth');
-
-% mouthdetect.MergeThreshold = 1; % Threshold value, starts at 1 or any value you want
-
-% FaceFound = 0;
-% whos FaceFound;
-% while FaceFound == 0
-%       bb_m = step(mouthdetect, faceCropedImg); % Detects mouth in image.
-%       whos bb_m;
-%       if(bb_m == emptyArray) % Check if a mouth is found, if not increase the Threshold by 1
-%           mouthdetect.MergeThreshold = mouthdetect.MergeThreshold + 1;
-%       else  
-%           mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', bb_m, 'Mouth'); % Annotation
-%           % mouth = imcrop(face, bb_m); % Crop segmented mouth
-%           FaceFound = 1;
-%           figure;
-%           imshow(mouth);
-%       end
-%  end
-
-
 %% resizing the croped image ## because it is small
 
  faceCropedImg = imresize(faceCropedImg,1.5);
  
+%% testing part
+% taking mouthnot found as in initial state
+MouthFound = 0;
+
+while MouthFound == 0
+    % declaring mouth detector
+    mouthdetector=vision.CascadeObjectDetector('Mouth');
+    
+    % set innitial threshold value
+    mouthdetector.MergeThreshold = 200;
+    % box for mouth detection
+    mouthbox = mouthdetector(faceCropedImg);
+    
+%     whos mouthbox;
+
+    %declaring empty matrix as double type
+    emptyDouble = double.empty(0,4);
+    % to check if any detection found #here we only need the size only
+    notEmptyDouble = ones(1,4);
+
+     if size(mouthbox) == size(emptyDouble) % Check if a mouth is found
+         % a is declared for testing purposes
+          a=mouthdetector.MergeThreshold
+          
+          %while threshold value is greater than 5 decrease threshold value by 1 
+          while mouthdetector.MergeThreshold > 5
+              %b is declared for testing purpose
+              c=mouthdetector.MergeThreshold
+              
+              %reduce by 1
+              mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 1;
+              %find for detection
+              mouthbox = mouthdetector(faceCropedImg);
+%               whos mouthbox;
+              %if any one object found break the loop and show the detected
+              %image
+              if size(mouthbox) == size(notEmptyDouble)
+                  mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth'); % Annotation
+                  MouthFound = 1;
+%                   figure;
+%                   imshow(mouth);
+%                   title('finally mouth found')
+                  axes(handles.axes4);
+                  imshow(mouth); 
+                  break;
+              elseif mouthdetector.MergeThreshold == 6
+                  mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth');
+                  MouthFound = 0;
+                  axes(handles.axes4);
+                  imshow(mouth); 
+                  break;
+              end
+          end
+          break;
+     else  
+          mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth'); % Annotation
+          % mouth = imcrop(face, bb_m); % Crop segmented mouth
+          MouthFound = 1;
+          axes(handles.axes4);
+          imshow(mouth); 
+%           figure;
+%           imshow(mouth);
+%           title('mouth found')
+      end
+ end
+
+ 
+
+%% 
  %%  displaying the mouth detection if detected
 
- mouthdetector=vision.CascadeObjectDetector('Mouth','MergeThreshold',200);
+%  mouthdetector=vision.CascadeObjectDetector('Mouth','MergeThreshold',200);
+%  
+%  mouthbox = mouthdetector(faceCropedImg);
+%  whos mouthbox;
+%  
+%  mouth = insertObjectAnnotation(faceCropedImg,'rectangle',mouthbox,'Mouth');   
+%  mouthHasBeenDetected = true;
+%  axes(handles.axes4);
+%  imshow(mouth); 
  
- mouthbox = mouthdetector(faceCropedImg);
- whos mouthbox;
- 
- mouth = insertObjectAnnotation(faceCropedImg,'rectangle',mouthbox,'Mouth');   
- mouthHasBeenDetected = true;
- axes(handles.axes4);
- imshow(mouth); 
- 
-% figure
-% imshow(mouth)
-% title('Detected Mouth');
 
 %% check if there is no mouth detection 
  
-Bdouble = double.empty(0,4);
-box = double(mouthbox);
-
-if size(box) == size(Bdouble)
-%     set global variable mouthHasBeenDetected to true
-
-mouthHasBeenDetected = false;
-axes(handles.axes4);
-imshow('nodetection.jpeg');
-end
+% Bdouble = double.empty(0,4);
+% box = double(mouthbox);
+% 
+% if size(box) == size(Bdouble)
+% %     set global variable mouthHasBeenDetected to false
+% 
+% mouthHasBeenDetected = false;
+% axes(handles.axes4);
+% imshow('nodetection.jpeg');
+% end
 
 
 % % mouthdetect = vision.CascadeObjectDetector('Mouth');
@@ -160,39 +205,102 @@ end
 % mouthdetect.MergeThreshold = 1; % Threshold value, starts at 1 or any value you want
 
 
+%% testing for nose
+% taking mouthnot found as in initial state
+NoseFound = 0;
+
+while NoseFound == 0
+    % declaring mouth detector
+    nosedetector=vision.CascadeObjectDetector('Nose');
+    
+    % set innitial threshold value
+    nosedetector.MergeThreshold = 200;
+    % box for mouth detection
+    mouthbox = nosedetector(faceCropedImg);
+    
+%     whos mouthbox;
+
+    %declaring empty matrix as double type
+    emptyDouble = double.empty(0,4);
+    % to check if any detection found #here we only need the size only
+    notEmptyDouble = ones(1,4);
+
+     if size(mouthbox) == size(emptyDouble) % Check if a mouth is found
+         % a is declared for testing purposes
+          a=nosedetector.MergeThreshold
+          
+          %while threshold value is greater than 5 decrease threshold value by 1 
+          while nosedetector.MergeThreshold > 5
+              %b is declared for testing purpose
+              b=nosedetector.MergeThreshold
+              
+              %reduce by 1
+              nosedetector.MergeThreshold = nosedetector.MergeThreshold - 1;
+              %find for detection
+              nosebox = nosedetector(faceCropedImg);
+%               whos mouthbox;
+              %if any one object found break the loop and show the detected
+              %image
+              if size(nosebox) == size(notEmptyDouble)
+                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
+                  NoseFound = 1;
+                  axes(handles.axes3);
+                  imshow(nose); 
+%                   figure;
+%                   imshow(nose);
+%                   title('finally nose found')
+                  break;
+              elseif nosedetector.MergeThreshold == 6
+                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Nose');
+                  NoseFound = 0;
+                  axes(handles.axes3);
+                  imshow(nose); 
+                  break;
+              end
+          
+          end
+          break;
+     else  
+          nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
+          % mouth = imcrop(face, bb_m); % Crop segmented mouth
+          NoseFound = 1;
+          axes(handles.axes3);
+          imshow(nose); 
+%           figure;
+%           imshow(mouth);
+%           title('nose found')
+      end
+ end
+
 %% checking for nose detection
-  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',20);
-  
-  nosebox = nosedetector(faceCropedImg);
-  whos nosebox;
- 
- nose = insertObjectAnnotation(faceCropedImg,'rectangle',nosebox,'Nose');   
- noseHasBeenDetected = true;
-    axes(handles.axes3);
-   imshow(nose); 
-% figure
-% imshow(nose)
-% title('Detected Nose');
+%   nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',20);
+%   
+%   nosebox = nosedetector(faceCropedImg);
+%   whos nosebox;
+%  
+%  nose = insertObjectAnnotation(faceCropedImg,'rectangle',nosebox,'Nose');   
+%  noseHasBeenDetected = true;
+%     axes(handles.axes3);
+%    imshow(nose); 
+
 
 %% check if there is no nose detection 
  
-% Bdouble = double.empty(0,4);
-% box = double(mouthbox);
-
-if size(box) == size(Bdouble)
-%     set global variable mouthHasBeenDetected to true
-noseHasBeenDetected = false;
-axes(handles.axes3);
- imshow('nodetection.jpeg');
-%     figure
-%     imshow(img);
-%     title("inside if")
-end
+% % Bdouble = double.empty(0,4);
+% % box = double(mouthbox);
+% 
+% if size(box) == size(Bdouble)
+% %     set global variable mouthHasBeenDetected to true
+% noseHasBeenDetected = false;
+% axes(handles.axes3);
+%  imshow('nodetection.jpeg');
+% 
+% end
 
 %% display result as message
-if noseHasBeenDetected && mouthHasBeenDetected==1
+if NoseFound && MouthFound==1
     f = msgbox('Please wear mask');
-elseif xor(noseHasBeenDetected,mouthHasBeenDetected)==1
+elseif xor(NoseFound,MouthFound)==1
     f = msgbox('Please wear mask properly');
 else
     f = msgbox('Thank you for wearing mask!!!');
