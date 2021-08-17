@@ -1,7 +1,7 @@
 clear
 clc
 
- img = imread('nomask7.jpeg');
+ img = imread('notproperly2.jpeg');
 % img = imread('Dive.png');
 % img = imresize(img,0.3);
 % imshow(img);
@@ -53,37 +53,35 @@ while MouthFound == 0
          % a is declared for testing purposes
           a=mouthdetector.MergeThreshold
           
-          %while threshold value is greater than 4 do the following 
-          while mouthdetector.MergeThreshold > 4
+          %while threshold value is greater than 5 decrease threshold value by 1 
+          while mouthdetector.MergeThreshold > 5
               %b is declared for testing purpose
               b=mouthdetector.MergeThreshold
               
-%               if mouthdetector.MergeThreshold > 5
-                  mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 5;
-                  mouthbox = mouthdetector(img);
-                  whos mouthbox;
-                  if size(mouthbox) == size(notEmptyDouble)
-                      mouth = insertObjectAnnotation(img, 'rectangle', mouthbox, 'Mouth'); % Annotation
-                      figure;
-                      imshow(mouth);
-                      title('finally mouth found')
-                      break;
-%              mouthdetector=vision.CascadeObjectDetector('Mouth');
-%                a=mouthdetector.MergeThreshold
-                  end
-%               end
+              %reduce by 1
+              mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 1;
+              %find for detection
+              mouthbox = mouthdetector(img);
+%               whos mouthbox;
+              %if any one object found break the loop and show the detected
+              %image
+              if size(mouthbox) == size(notEmptyDouble)
+                  mouth = insertObjectAnnotation(img, 'rectangle', mouthbox, 'Mouth'); % Annotation
+                  MouthFound = 1;
+                  figure;
+                  imshow(mouth);
+                  title('finally mouth found')
+                  break;
+              end
           end
           break;
-%      elseif mouthdetector.MergeThreshold == 5
-%          MouthFound = 1;
      else  
           mouth = insertObjectAnnotation(img, 'rectangle', mouthbox, 'Mouth'); % Annotation
           % mouth = imcrop(face, bb_m); % Crop segmented mouth
-          whos mouth;
           MouthFound = 1;
           figure;
           imshow(mouth);
-          title('finally mouth found')
+          title('mouth found')
       end
  end
 
