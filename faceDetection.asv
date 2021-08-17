@@ -1,34 +1,110 @@
 clear
 clc
 
- img = imread('Camping.jpg');
+ img = imread('nomask7.jpeg');
 % img = imread('Dive.png');
-img = imresize(img,0.3);
+% img = imresize(img,0.3);
 % imshow(img);
 
 % detector = vision.CascadeObjectDetector('ClassificationModel','Mouth');
-detector=vision.CascadeObjectDetector('Mouth','MergeThreshold',100);
+% % mouthdetector=vision.CascadeObjectDetector('Mouth');
+% % mouthdetector.MergeThreshold = 60;
+% ,'MergeThreshold',100
 
 
-bbox = detector(img);
-whos bbox;
+% % mouthbox = mouthdetector(img);
+% % whos mouthbox;
 
-IFaces = insertObjectAnnotation(img,'rectangle',bbox,'Mouth');   
+% % IFaces = insertObjectAnnotation(img,'rectangle',mouthbox,'Mouth');   
 % mouth = imcrop(img, bbox);
-figure
+% figure
 % imshow(IFaces)
 % imshow(mouth);
-title('Detected faces');
+% title('Detected faces');
+
+
+% % Bdouble = double.empty(0,4);
+% % box = double(mouthbox);
+
+
+
+
+
+% taking mouthnot found as in initial state
+MouthFound = 0;
+
+while MouthFound == 0
+    % declaring mouth detector
+    mouthdetector=vision.CascadeObjectDetector('Mouth');
+    
+    % set innitial threshold value
+    mouthdetector.MergeThreshold = 900;
+    % box for mouth detection
+    mouthbox = mouthdetector(img);
+    
+%     whos mouthbox;
+
+    %declaring empty matrix as double type
+    emptyDouble = double.empty(0,4);
+    % to check if any detection found #here we only chech the size only
+    notEmptyDouble = ones(1,4);
+    box = double(mouthbox);
+%       mouthbox = mouthdetector(faceCropedImage); % Detects mouth in image.
+%       mouthdetector.MergeThreshold = 1;
+     if size(mouthbox) == size(emptyDouble) % Check if a mouth is found, if not decrease the Threshold by 5
+%          mouthdetector.MergeThreshold=40;
+          a=mouthdetector.MergeThreshold
+          while mouthdetector.MergeThreshold > 4
+              b=mouthdetector.MergeThreshold
+              if mouthdetector.MergeThreshold == 5
+                 break; 
+              elseif mouthdetector.MergeThreshold > 5
+                  mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 5;
+                  mouthbox = mouthdetector(img);
+                  whos mouthbox;
+                  if size(mouthbox) == size(notEmptyDouble)
+                      mouth = insertObjectAnnotation(img, 'rectangle', mouthbox, 'Mouth'); % Annotation
+                      figure;
+                      imshow(mouth);
+                      title('finally mouth found')
+                      break;
+%              mouthdetector=vision.CascadeObjectDetector('Mouth');
+%                a=mouthdetector.MergeThreshold
+                  end
+              end
+          end
+          break;
+%      elseif mouthdetector.MergeThreshold == 5
+%          MouthFound = 1;
+     else  
+          mouth = insertObjectAnnotation(img, 'rectangle', mouthbox, 'Mouth'); % Annotation
+          % mouth = imcrop(face, bb_m); % Crop segmented mouth
+          whos mouth;
+          MouthFound = 1;
+          figure;
+          imshow(mouth);
+          title('finally mouth found')
+      end
+ end
+
+
+
+
+
+
+
+
+
 
 % Aint = int16.empty(0,4);
-Bdouble = double.empty(0,4);
-a = double(bbox);
-
-if size(a) == size(Bdouble)
-    figure
-    imshow(img);
-    whos img;
-    title("inside if")
-end    
-
-whos Bdouble;
+% Bdouble = double.empty(0,4);
+% a = double(bbox);
+% 
+% if size(a) == size(Bdouble)
+%     figure
+%     imshow(img);
+%     whos img;
+%     title("inside if")
+% end    
+% 
+% whos Bdouble;

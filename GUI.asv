@@ -150,13 +150,36 @@ if size(box) == size(Bdouble)
 %     set global variable mouthHasBeenDetected to true
 
 mouthHasBeenDetected = false;
+axes(handles.axes4);
+ imshow('nodetection.jpeg');
 %     figure
 %     imshow(img);
 %     title("inside if")
 end
 
+
+% % mouthdetect = vision.CascadeObjectDetector('Mouth');
+
+% mouthdetect.MergeThreshold = 1; % Threshold value, starts at 1 or any value you want
+
+MouthFound = 0;
+% whos MouthFound;
+while MouthFound == 0
+      mouthbox = step(mouthdetector, faceCropedImg); % Detects mouth in image.
+      whos bb_m;
+      if(bb_m == emptyArray) % Check if a mouth is found, if not increase the Threshold by 1
+          mouthdetect.MergeThreshold = mouthdetect.MergeThreshold + 1;
+      else  
+          mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', bb_m, 'Mouth'); % Annotation
+          % mouth = imcrop(face, bb_m); % Crop segmented mouth
+          MouthFound = 1;
+          figure;
+          imshow(mouth);
+      end
+ end
+
 %% checking for nose detection
-  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',50);
+  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',20);
   
   nosebox = nosedetector(faceCropedImg);
   whos nosebox;
@@ -177,14 +200,22 @@ end
 if size(box) == size(Bdouble)
 %     set global variable mouthHasBeenDetected to true
 noseHasBeenDetected = false;
+axes(handles.axes3);
+ imshow('nodetection.jpeg');
 %     figure
 %     imshow(img);
 %     title("inside if")
 end
 
 %% display result as message
-if noseHasBeenDetected && mouthHasBeenDetected
-    f = msgbox('Operation Completed');
+if noseHasBeenDetected && mouthHasBeenDetected==1
+    f = msgbox('Please wear mask');
+elseif xor(noseHasBeenDetected,mouthHasBeenDetected)==1
+    f = msgbox('Please wear mask properly');
+else
+    f = msgbox('Thank you for wearing mask!!!');
+end
+
 
 
 
@@ -199,18 +230,18 @@ global img;
 global faceDetectedImg;
 global faceCropedImg;
 
+facedetector=vision.CascadeObjectDetector('FrontalFaceLBP');
+% facedetector = vision.CascadeObjectDetector;
+% facedetector=vision.CascadeObjectDetector('MergeThreshold',30);
 
-detector = vision.CascadeObjectDetector;
-% detector=vision.CascadeObjectDetector('MergeThreshold',30);
+facebox = facedetector(img);
 
-bbox = detector(img);
-
-faceDetectedImg = insertObjectAnnotation(img,'rectangle',bbox,'Face');   
+faceDetectedImg = insertObjectAnnotation(img,'rectangle',facebox,'Face');   
 
 % crop and segment the face from the image using for loop
 
- for i = 1 : size(bbox, 1) 
-   faceCropedImg = imcrop(img, bbox(i, :));
+ for i = 1 : size(facebox, 1) 
+   faceCropedImg = imcrop(img, facebox(i, :));
    axes(handles.axes2);
    imshow(faceCropedImg); 
  end

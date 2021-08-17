@@ -150,13 +150,18 @@ if size(box) == size(Bdouble)
 %     set global variable mouthHasBeenDetected to true
 
 mouthHasBeenDetected = false;
-%     figure
-%     imshow(img);
-%     title("inside if")
+axes(handles.axes4);
+imshow('nodetection.jpeg');
 end
 
+
+% % mouthdetect = vision.CascadeObjectDetector('Mouth');
+
+% mouthdetect.MergeThreshold = 1; % Threshold value, starts at 1 or any value you want
+
+
 %% checking for nose detection
-  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',50);
+  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',20);
   
   nosebox = nosedetector(faceCropedImg);
   whos nosebox;
@@ -177,19 +182,23 @@ end
 if size(box) == size(Bdouble)
 %     set global variable mouthHasBeenDetected to true
 noseHasBeenDetected = false;
+axes(handles.axes3);
+ imshow('nodetection.jpeg');
 %     figure
 %     imshow(img);
 %     title("inside if")
 end
 
 %% display result as message
-if noseHasBeenDetected && mouthHasBeenDetected
+if noseHasBeenDetected && mouthHasBeenDetected==1
     f = msgbox('Please wear mask');
-elseif noseHasBeenDetected || mouthHasBeenDetected
+elseif xor(noseHasBeenDetected,mouthHasBeenDetected)==1
     f = msgbox('Please wear mask properly');
 else
     f = msgbox('Thank you for wearing mask!!!');
 end
+
+
 
 
 % --- Executes on button press in pushbutton3.
@@ -203,18 +212,18 @@ global img;
 global faceDetectedImg;
 global faceCropedImg;
 
+facedetector=vision.CascadeObjectDetector('FrontalFaceLBP');
+% facedetector = vision.CascadeObjectDetector;
+% facedetector=vision.CascadeObjectDetector('MergeThreshold',30);
 
-detector = vision.CascadeObjectDetector;
-% detector=vision.CascadeObjectDetector('MergeThreshold',30);
+facebox = facedetector(img);
 
-bbox = detector(img);
-
-faceDetectedImg = insertObjectAnnotation(img,'rectangle',bbox,'Face');   
+faceDetectedImg = insertObjectAnnotation(img,'rectangle',facebox,'Face');   
 
 % crop and segment the face from the image using for loop
 
- for i = 1 : size(bbox, 1) 
-   faceCropedImg = imcrop(img, bbox(i, :));
+ for i = 1 : size(facebox, 1) 
+   faceCropedImg = imcrop(img, facebox(i, :));
    axes(handles.axes2);
    imshow(faceCropedImg); 
  end
