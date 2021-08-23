@@ -1,0 +1,57 @@
+% If nose not detected for the given threshold value we want to reduce
+% threshold value until it detects it
+
+NoseFound = 0; % initial state, as if nose not found
+
+while NoseFound == 0
+    % declaring nose detector
+    nosedetector=vision.CascadeObjectDetector('Nose');
+    % set innitial threshold value you want
+    nosedetector.MergeThreshold = 40;
+    % box for mouth detection
+    nosebox = nosedetector(faceCropedImg);
+
+     if(sum(sum(nosebox))~=0) % if nose is found
+          % while threshold value is greater than (number) reduce the
+          % threshold
+          while nosedetector.MergeThreshold > 10
+              %b is declared for testing purpose
+              n=nosedetector.MergeThreshold
+              
+              %reduce by 1
+              nosedetector.MergeThreshold = nosedetector.MergeThreshold - 1;
+              %find for detection
+              nosebox = nosedetector(faceCropedImg);
+%               whos mouthbox;
+              %if any one object found break the loop and show the detected
+              %image
+              if size(nosebox) == size(notEmptyDouble)
+                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
+                  NoseFound = 1;
+                  axes(handles.axes3);
+                  imshow(nose); 
+%                   figure;
+%                   imshow(nose);
+%                   title('finally nose found')
+                  break;
+              elseif nosedetector.MergeThreshold == 20
+                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose');
+                  NoseFound = 0;
+                  axes(handles.axes3);
+                  imshow(nose); 
+                  break;
+              end
+          
+          end
+          break;
+     else  
+          nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
+          % mouth = imcrop(face, bb_m); % Crop segmented nose
+          NoseFound = 1;
+          axes(handles.axes3);
+          imshow(nose); 
+%           figure;
+%           imshow(mouth);
+%           title('nose found')
+      end
+end

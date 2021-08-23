@@ -78,21 +78,24 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global img
-% get image
-[filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
-img=imread(filename);
 
+ global img;
+%  select image
  [filename, pathname] = uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
     if isequal(filename,0) || isequal(pathname,0)
        disp('User pressed cancel')
     else
        filename=strcat(pathname,filename);
+       img=imread(filename);
+%         img=imrotate(img, 270);
+
+       axes(handles.axes1);
+        imshow(img);
+        title("Test image");
     end
 
-% show image in the GUI axes
-axes(handles.axes1);
-imshow(img);
+
+
 
 
 % --- Executes on button press in pushbutton2.
@@ -103,102 +106,120 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 
 global img;
 global faceCropedImg;
-global emptyArray;
 global mouthHasBeenDetected;
 global noseHasBeenDetected;
 
 %% resizing the croped image ## because it is small
 
- faceCropedImg = imresize(faceCropedImg,1.5);
+%  faceCropedImg = imresize(faceCropedImg,[128 128]);
+faceCropedImg = imresize(faceCropedImg,[300 NaN]);
+% faceCropedImg = rgb2gray(faceCropedImg);
+% faceCropedImg=imgaussfilt(faceCropedImg,2);
  
-%% testing part
+
+ %% testing part
 % taking mouthnot found as in initial state
-MouthFound = 0;
 
-while MouthFound == 0
-    % declaring mouth detector
-    mouthdetector=vision.CascadeObjectDetector('Mouth');
-    
-    % set innitial threshold value
-    mouthdetector.MergeThreshold = 200;
-    % box for mouth detection
-    mouthbox = mouthdetector(faceCropedImg);
-    
-%     whos mouthbox;
 
-    %declaring empty matrix as double type
-    emptyDouble = double.empty(0,4);
-    % to check if any detection found #here we only need the size only
-    notEmptyDouble = ones(1,4);
-
-     if size(mouthbox) == size(emptyDouble) % Check if a mouth is found
-         % a is declared for testing purposes
-          a=mouthdetector.MergeThreshold
-          
-          %while threshold value is greater than 5 decrease threshold value by 1 
-          while mouthdetector.MergeThreshold > 40
-              %b is declared for testing purpose
-              m=mouthdetector.MergeThreshold
-              
-              %reduce by 1
-              mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 1;
-              %find for detection
-              mouthbox = mouthdetector(faceCropedImg);
-%               whos mouthbox;
-              %if any one object found break the loop and show the detected
-              %image
-              if size(mouthbox) == size(notEmptyDouble)
-                  mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth'); % Annotation
-                  MouthFound = 1;
-%                   figure;
-%                   imshow(mouth);
-%                   title('finally mouth found')
-                  axes(handles.axes4);
-                  imshow(mouth); 
-                  break;
-              elseif mouthdetector.MergeThreshold == 40
-                  mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth');
-                  MouthFound = 0;
-                  axes(handles.axes4);
-                  imshow(mouth); 
-                  break;
-              end
-          end
-          break;
-     else  
-          mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth'); % Annotation
-          % mouth = imcrop(face, bb_m); % Crop segmented mouth
-          MouthFound = 1;
-          axes(handles.axes4);
-          imshow(mouth); 
-%           figure;
-%           imshow(mouth);
-%           title('mouth found')
-      end
- end
+% MouthFound = 0;
+% 
+% while MouthFound == 0
+%     % declaring mouth detector
+%     mouthdetector=vision.CascadeObjectDetector('Mouth');
+%     
+%     % set innitial threshold value
+%     mouthdetector.MergeThreshold = 100;
+%     % box for mouth detection
+%     mouthbox = mouthdetector(faceCropedImg);
+%     
+% %     whos mouthbox;
+% 
+%     %declaring empty matrix as double type
+%     emptyDouble = double.empty(0,4);
+%     % to check if any detection found #here we only need the size only
+%     notEmptyDouble = ones(1,4);
+% 
+%      if size(mouthbox) == size(emptyDouble) % Check if a mouth is found
+%          % a is declared for testing purposes
+%           a=mouthdetector.MergeThreshold
+%           
+%           %while threshold value is greater than 5 decrease threshold value by 1 
+%           while mouthdetector.MergeThreshold > 40
+%               %b is declared for testing purpose
+%               m=mouthdetector.MergeThreshold
+%               
+%               %reduce by 1
+%               mouthdetector.MergeThreshold = mouthdetector.MergeThreshold - 1;
+%               %find for detection
+%               mouthbox = mouthdetector(faceCropedImg);
+% %               whos mouthbox;
+%               %if any one object found break the loop and show the detected
+%               %image
+%               if size(mouthbox) == size(notEmptyDouble)
+%                   mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth'); % Annotation
+%                   MouthFound = 1;
+% %                   figure;
+% %                   imshow(mouth);
+% %                   title('finally mouth found')
+%                   axes(handles.axes4);
+%                   imshow(mouth); 
+%                   break;
+%               elseif mouthdetector.MergeThreshold == 40
+%                   mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth');
+%                   MouthFound = 0;
+%                   axes(handles.axes4);
+%                   imshow(mouth); 
+%                   break;
+%               end
+%           end
+%           break;
+%      else  
+%           mouth = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Mouth'); % Annotation
+%           % mouth = imcrop(face, bb_m); % Crop segmented mouth
+%           MouthFound = 1;
+%           axes(handles.axes4);
+%           imshow(mouth); 
+% %           figure;
+% %           imshow(mouth);
+% %           title('mouth found')
+%       end
+%  end
 
  
 
 %% 
- %%  displaying the mouth detection if detected
+ %  displaying the mouth detection if detected
 
-%  mouthdetector=vision.CascadeObjectDetector('Mouth','MergeThreshold',200);
-%  
-%  mouthbox = mouthdetector(faceCropedImg);
+ mouthdetector=vision.CascadeObjectDetector('Mouth','MergeThreshold',150);
+ 
+ mouthbox = mouthdetector(faceCropedImg);
 %  whos mouthbox;
-%  
+
+if(sum(sum(mouthbox))~=0)
+     mouth = insertObjectAnnotation(faceCropedImg,'rectangle',mouthbox,'Mouth');   
+     mouthHasBeenDetected = true;
+     axes(handles.axes4);
+     imshow(mouth); 
+     title("Mouth detetced");
+ else
+    mouthHasBeenDetected = false;
+    axes(handles.axes4);
+    imshow(faceCropedImg);
+    title("Mouth not detected");
+ end
+ 
 %  mouth = insertObjectAnnotation(faceCropedImg,'rectangle',mouthbox,'Mouth');   
 %  mouthHasBeenDetected = true;
 %  axes(handles.axes4);
 %  imshow(mouth); 
  
 
-%% check if there is no mouth detection 
+% check if there is no mouth detection 
  
 % Bdouble = double.empty(0,4);
 % box = double(mouthbox);
 % 
-% if size(box) == size(Bdouble)
+% if size(mouthbox) == size(Bdouble)
 % %     set global variable mouthHasBeenDetected to false
 % 
 % mouthHasBeenDetected = false;
@@ -212,102 +233,115 @@ while MouthFound == 0
 % mouthdetect.MergeThreshold = 1; % Threshold value, starts at 1 or any value you want
 
 
+
 %% testing for nose
 % taking mouthnot found as in initial state
-NoseFound = 0;
+% 
+% NoseFound = 0;
+% 
+% while NoseFound == 0
+%     % declaring mouth detector
+%     nosedetector=vision.CascadeObjectDetector('Nose');
+%     
+%     % set innitial threshold value
+%     nosedetector.MergeThreshold = 40;
+%     % box for mouth detection
+%     nosebox = nosedetector(faceCropedImg);
+%     
+% %     whos mouthbox;
+% 
+%     %declaring empty matrix as double type
+%     emptyDouble = double.empty(0,4);
+%     % to check if any detection found #here we only need the size only
+%     notEmptyDouble = ones(1,4);
+% 
+%      if size(nosebox) == size(emptyDouble) % Check if a mouth is found
+%          % a is declared for testing purposes
+%           c=nosedetector.MergeThreshold
+%           
+%           %while threshold value is greater than 5 decrease threshold value by 1 
+%           while nosedetector.MergeThreshold > 20
+%               %b is declared for testing purpose
+%               n=nosedetector.MergeThreshold
+%               
+%               %reduce by 1
+%               nosedetector.MergeThreshold = nosedetector.MergeThreshold - 1;
+%               %find for detection
+%               nosebox = nosedetector(faceCropedImg);
+% %               whos mouthbox;
+%               %if any one object found break the loop and show the detected
+%               %image
+%               if size(nosebox) == size(notEmptyDouble)
+%                   nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
+%                   NoseFound = 1;
+%                   axes(handles.axes3);
+%                   imshow(nose); 
+% %                   figure;
+% %                   imshow(nose);
+% %                   title('finally nose found')
+%                   break;
+%               elseif nosedetector.MergeThreshold == 20
+%                   nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose');
+%                   NoseFound = 0;
+%                   axes(handles.axes3);
+%                   imshow(nose); 
+%                   break;
+%               end
+%           
+%           end
+%           break;
+%      else  
+%           nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
+%           % mouth = imcrop(face, bb_m); % Crop segmented nose
+%           NoseFound = 1;
+%           axes(handles.axes3);
+%           imshow(nose); 
+% %           figure;
+% %           imshow(mouth);
+% %           title('nose found')
+%       end
+% end
+% 
+%  
 
-while NoseFound == 0
-    % declaring mouth detector
-    nosedetector=vision.CascadeObjectDetector('Nose');
-    
-    % set innitial threshold value
-    nosedetector.MergeThreshold = 200;
-    % box for mouth detection
-    mouthbox = nosedetector(faceCropedImg);
-    
-%     whos mouthbox;
-
-    %declaring empty matrix as double type
-    emptyDouble = double.empty(0,4);
-    % to check if any detection found #here we only need the size only
-    notEmptyDouble = ones(1,4);
-
-     if size(mouthbox) == size(emptyDouble) % Check if a mouth is found
-         % a is declared for testing purposes
-          c=nosedetector.MergeThreshold
-          
-          %while threshold value is greater than 5 decrease threshold value by 1 
-          while nosedetector.MergeThreshold > 20
-              %b is declared for testing purpose
-              n=nosedetector.MergeThreshold
-              
-              %reduce by 1
-              nosedetector.MergeThreshold = nosedetector.MergeThreshold - 1;
-              %find for detection
-              nosebox = nosedetector(faceCropedImg);
-%               whos mouthbox;
-              %if any one object found break the loop and show the detected
-              %image
-              if size(nosebox) == size(notEmptyDouble)
-                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
-                  NoseFound = 1;
-                  axes(handles.axes3);
-                  imshow(nose); 
-%                   figure;
-%                   imshow(nose);
-%                   title('finally nose found')
-                  break;
-              elseif nosedetector.MergeThreshold == 20
-                  nose = insertObjectAnnotation(faceCropedImg, 'rectangle', mouthbox, 'Nose');
-                  NoseFound = 0;
-                  axes(handles.axes3);
-                  imshow(nose); 
-                  break;
-              end
-          
-          end
-          break;
-     else  
-          nose = insertObjectAnnotation(faceCropedImg, 'rectangle', nosebox, 'Nose'); % Annotation
-          % mouth = imcrop(face, bb_m); % Crop segmented mouth
-          NoseFound = 1;
-          axes(handles.axes3);
-          imshow(nose); 
-%           figure;
-%           imshow(mouth);
-%           title('nose found')
-      end
+% checking for nose detection
+  nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',8);
+  
+  nosebox = nosedetector(faceCropedImg);
+  whos nosebox;
+ 
+ if(sum(sum(nosebox))~=0)
+    nose = insertObjectAnnotation(faceCropedImg,'rectangle',nosebox,'Nose');   
+    noseHasBeenDetected = true;
+    axes(handles.axes3);
+    imshow(nose); 
+    title("Nose detected");
+ else
+    noseHasBeenDetected = false;
+    axes(handles.axes3);
+    imshow(faceCropedImg);
+    title("Nose not detected");
  end
 
-%% checking for nose detection
-%   nosedetector=vision.CascadeObjectDetector('Nose','MergeThreshold',20);
-%   
-%   nosebox = nosedetector(faceCropedImg);
-%   whos nosebox;
-%  
-%  nose = insertObjectAnnotation(faceCropedImg,'rectangle',nosebox,'Nose');   
-%  noseHasBeenDetected = true;
-%     axes(handles.axes3);
-%    imshow(nose); 
 
 
-%% check if there is no nose detection 
+% check if there is no nose detection 
  
-% % Bdouble = double.empty(0,4);
-% % box = double(mouthbox);
-% 
-% if size(box) == size(Bdouble)
+% Bdouble = double.empty(0,4);
+% box = double(mouthbox);
+
+% if size(nosebox) == size(Bdouble)
 % %     set global variable mouthHasBeenDetected to true
-% noseHasBeenDetected = false;
-% axes(handles.axes3);
-%  imshow('nodetection.jpeg');
+%     noseHasBeenDetected = false;
+%     axes(handles.axes3);
+%     imshow('nodetection.jpeg');
 % 
 % end
 
 %% display result as message
-if NoseFound && MouthFound==1
+if noseHasBeenDetected && mouthHasBeenDetected
     f = msgbox('Please wear mask');
-elseif xor(NoseFound,MouthFound)==1
+elseif xor(noseHasBeenDetected,mouthHasBeenDetected)
     f = msgbox('Please wear mask properly');
 else
     f = msgbox('Thank you for wearing mask!!!');
@@ -327,6 +361,16 @@ global img;
 global faceDetectedImg;
 global faceCropedImg;
 
+% img = rgb2gray(img);
+% img = medfilt3(img);
+% h = fspecial('log');
+% img=imfilter(img,h);
+
+img = rgb2gray(img);
+img=imgaussfilt(img,2);
+% img=imgaussfilt(img);
+% img = medfilt3(img);
+
 % facedetector=vision.CascadeObjectDetector('FrontalFaceLBP');
 facedetector = vision.CascadeObjectDetector;
 % facedetector=vision.CascadeObjectDetector('MergeThreshold',30);
@@ -336,12 +380,23 @@ facebox = facedetector(img);
 faceDetectedImg = insertObjectAnnotation(img,'rectangle',facebox,'Face');   
 
 % crop and segment the face from the image using for loop
+if(sum(sum(facebox))~=0)
+   for i = 1 : size(facebox, 1) 
+       faceCropedImg = imcrop(img, facebox(i, :));
+       axes(handles.axes2);
+       imshow(faceCropedImg); 
+       title("Face detected");
+   end
+else
+    title("Face not detected");
+end
 
- for i = 1 : size(facebox, 1) 
-   faceCropedImg = imcrop(img, facebox(i, :));
-   axes(handles.axes2);
-   imshow(faceCropedImg); 
- end
+
+%  for i = 1 : size(facebox, 1) 
+%    faceCropedImg = imcrop(img, facebox(i, :));
+%    axes(handles.axes2);
+%    imshow(faceCropedImg); 
+%  end
 
 %  crop face without using for loop ## does not work for now
 
@@ -364,3 +419,285 @@ clear global img;
 clear global faceCropedImg;
 clear global faceDetectedImg;
 close all;
+
+
+
+
+
+
+
+
+
+
+
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% function varargout = final(varargin)
+% % FINAL MATLAB code for final.fig
+% %      FINAL, by itself, creates a new FINAL or raises the existing
+% %      singleton*.
+% %
+% %      H = FINAL returns the handle to a new FINAL or the handle to
+% %      the existing singleton*.
+% %
+% %      FINAL('CALLBACK',hObject,eventData,handles,...) calls the local
+% %      function named CALLBACK in FINAL.M with the given input arguments.
+% %
+% %      FINAL('Property','Value',...) creates a new FINAL or raises the
+% %      existing singleton*.  Starting from the left, property value pairs are
+% %      applied to the GUI before final_OpeningFcn gets called.  An
+% %      unrecognized property name or invalid value makes property application
+% %      stop.  All inputs are passed to final_OpeningFcn via varargin.
+% %
+% %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+% %      instance to run (singleton)".
+% %
+% % See also: GUIDE, GUIDATA, GUIHANDLES
+% 
+% % Edit the above text to modify the response to help final
+% 
+% % Last Modified by GUIDE v2.5 23-Aug-2021 10:31:40
+% 
+% % Begin initialization code - DO NOT EDIT
+% gui_Singleton = 1;
+% gui_State = struct('gui_Name',       mfilename, ...
+%                    'gui_Singleton',  gui_Singleton, ...
+%                    'gui_OpeningFcn', @final_OpeningFcn, ...
+%                    'gui_OutputFcn',  @final_OutputFcn, ...
+%                    'gui_LayoutFcn',  [] , ...
+%                    'gui_Callback',   []);
+% if nargin && ischar(varargin{1})
+%     gui_State.gui_Callback = str2func(varargin{1});
+% end
+% 
+% if nargout
+%     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+% else
+%     gui_mainfcn(gui_State, varargin{:});
+% end
+% % End initialization code - DO NOT EDIT
+% 
+% 
+% % --- Executes just before final is made visible.
+% function final_OpeningFcn(hObject, eventdata, handles, varargin)
+% % This function has no output args, see OutputFcn.
+% % hObject    handle to figure
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% % varargin   command line arguments to final (see VARARGIN)
+% 
+% % Choose default command line output for final
+% handles.output = hObject;
+% 
+% % Update handles structure
+% guidata(hObject, handles);
+% 
+% % UIWAIT makes final wait for user response (see UIRESUME)
+% % uiwait(handles.figure1);
+% 
+% 
+% % --- Outputs from this function are returned to the command line.
+% function varargout = final_OutputFcn(hObject, eventdata, handles) 
+% % varargout  cell array for returning output args (see VARARGOUT);
+% % hObject    handle to figure
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Get default command line output from handles structure
+% varargout{1} = handles.output;
+% 
+% 
+% % --- Executes on button press in select_image.
+% function select_image_Callback(hObject, eventdata, handles)
+% global img
+% % get image
+% % [filename, pathname]=uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
+% % img=imread(filename);
+% 
+% [filename, pathname] = uigetfile({'*.bmp;*.jpg;*.jpeg;*.tif;*.png;','IMAGE FILES (*.bmp,*.jpg,*.jpeg,*.tif,*.png)'},'Choose an image');
+%     if isequal(filename,0) || isequal(pathname,0)
+%        disp('User pressed cancel')
+%     else
+%        filename=strcat(pathname,filename);
+%        img=imread(filename);
+%        % show image in the GUI axes
+%        axes(handles.axes1);
+%        imshow(img);
+%     end
+% 
+% 
+% % --- Executes on button press in resize_image.
+% function resize_image_Callback(hObject, eventdata, handles)
+% global img
+% global img_resized
+% 
+% [width, height] = size(img);
+% 
+% if width>320
+%     img_resized = imresize(img,[300 NaN]);
+% else
+%     img_resized = img;
+% end
+% 
+% % [row col channel] = size(img);
+% % img_resized = imresize(img,[300 300]); % Need to change the size of the resize
+% 
+% % Displaying the image
+% axes(handles.axes2);
+% imshow(img_resized);
+% title('Resized Image(300*300)');
+% 
+% handles.ResizedImage = img_resized;
+% guidata(hObject,handles);
+% 
+% % --- Executes on button press in filter_image.
+% function filter_image_Callback(hObject, eventdata, handles)
+% global img_resized
+% 
+% 
+% facedetector=vision.CascadeObjectDetector;
+% img_resized = rgb2gray(img_resized);
+% img_resized=imgaussfilt(img_resized);
+% facebox = facedetector(img_resized);
+% 
+% if(sum(sum(facebox))~=0) % if face detected
+%         img_resized=imcrop(img_resized,facebox(1, :)); % crop detected face
+%         img_resized=imresize(img_resized,[128 128]); % resize image
+%         %fullFileName = fullfile('mask weared', strcat(num2str,'.jpeg'));
+%         %imwrite(img_resized,fullFileName);   % Save image
+%         axes(handles.axes3);
+%         imshow(img_resized);
+%         title('Face Croped');
+% end
+% 
+% % Im = im2bw(img_resized);
+% % Im = rgb2gray(img_resized);
+% % K = wiener2(Im,[5 5]);
+% Im=img_resized;
+% % K = medfilt3(Im);
+% axes(handles.axes4);
+% imshow(Im);
+% title('Image filtered');
+% 
+% 
+% % handles.ResizedImage = Im;
+% img_resized = Im;
+% 
+% % --- Executes on button press in train_image.
+% function train_image_Callback(hObject, eventdata, handles)
+% %% Trainig an Image
+% global img_resized
+% im = img_resized;
+% c=input('Enter the Class(Number from 1-4) :');
+% %% Feature Extraction
+% F=FeatureStatistical(im);
+% % ndims(im)
+% try c
+%     load DB;
+%     F=[F c];
+%     DB=[DB; F];
+%     save DB.mat DB 
+% catch 
+% %     size(F,1)
+% %     size(c,1)
+% %       F
+% %       c
+% %     ndims(F)
+% %     ndims(c)
+%     DB=[F c]; % 10 12 1 % m s c
+%     save DB.mat DB 
+% end
+% 
+% 
+% % --- Executes on button press in test_image.
+% function test_image_Callback(hObject, eventdata, handles)
+% %% Test Image
+% % clc;
+% % clear all;
+% % close all;
+% % [fname, path]=uigetfile('.jpeg','provide an Image for testing');
+% % fname=strcat(path, fname);
+% % im=imread(fname);
+% % im=im2bw(im);
+% % imshow(im);
+% % title('Test Image');
+% % %% Find the class the test image belongs
+% % Ftest=FeatureStatistical(im);
+% % % Compare with the feature of training image in the database
+% % load DB.mat
+% % Ftrain=DB(:,1:2);
+% % Ctrain=DB(:,3);
+% % for (i=1:size(Ftrain,1));
+% %     dist(i,:)=sum(abs(Ftrain(i,:)-Ftest));
+% % end   
+% % m=find(dist==min(dist),1);
+% % det_class=Ctrain(m);
+% % msgbox(strcat('Detected Class=',num2str(det_class)));
+% 
+% 
+% % --- Executes on button press in pushbutton6.
+% function pushbutton6_Callback(hObject, eventdata, handles)
+% % hObject    handle to pushbutton6 (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% load DB.mat
+% global img_resized
+% im = img_resized
+% Ftest=FeatureStatistical(im);
+% % Compare with the feature of training image in the database
+% 
+% Ftrain=DB(:,1:2);
+% Ctrain=DB(:,3);
+% for (i=1:size(Ftrain,1));
+%     dist(i,:)=sum(abs(Ftrain(i,:)-Ftest));
+% end   
+% m=find(dist==min(dist),1);
+% det_class=Ctrain(m);
+% % msgbox(strcat('Detected Class=',num2str(det_class)));
+% 
+% if det_class == 1
+%     helpdlg(' Mask weared ');
+%     disp('Mask weared');
+% elseif det_class == 2
+%     helpdlg(' Mask not weared ');
+%     disp(' Mask not weared ');
+% elseif det_class == 3
+%     helpdlg(' Mask weared not properly ');
+%     disp('Mask weared not properly');
+% elseif det_class == 4
+%     helpdlg(' Mask weared not properly ');
+%     disp('Mask weared not properly');
+% else
+%     helpdlg('Unable to recognize');
+%     disp('Unable to recognize');
+% end
+% 
+% 
+% 
+% % --- Executes on button press in pushbutton7.
+% function pushbutton7_Callback(hObject, eventdata, handles)
+% % hObject    handle to pushbutton7 (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% clear all;
+% clear global img;
+% clear global img_resized;
+% close all;
+% 
+% 
+% % --- Executes on button press in pushbutton8.
+% function pushbutton8_Callback(hObject, eventdata, handles)
+% % hObject    handle to pushbutton8 (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global img;
+% 
+% imshow(img)
+% img=imrotate(img, 90);
+% handles.img = img;
