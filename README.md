@@ -9,4 +9,4 @@ If either one of them were detected (XOR) "Please wear mask properly"
 And if nothing was detected "Thank you for wearing mask."
 
 GUI.m is the main working script.
-reduceThresholdValue.m is not used for the project, the code will be usefull if you need to reduce threshold value at some point.
+reduceThresholdValue.m is not used in the project, the code will be usefull if you need to reduce threshold value at some point.
